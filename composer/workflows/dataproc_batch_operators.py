@@ -50,7 +50,8 @@ PYTHON_FILE_LOCATION = "gs://{{var.value.bucket_name }}/spark-job.py"
 PHS_CLUSTER_PATH = \
     "projects/{{ var.value.project_id }}/regions/{{ var.value.region_name}}/clusters/{{ var.value.phs_cluster }}"
 # for e.g. projects/my-project/regions/my-region/clusters/my-cluster"
-SPARK_BIGQUERY_JAR_FILE = "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"
+SPARK_BIGQUERY_JAR_FILE = "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar" 
+#use this for those pyspark jobs that need a spark-bigquery connector https://cloud.google.com/dataproc/docs/tutorials/bigquery-connector-spark-example
 # Start a Dataproc MetaStore Cluster
 METASTORE_SERVICE_LOCATION = \
     "projects/{{var.value.project_id}}/locations/{{var.value.region_name}}/services/{{var.value.metastore_cluster }}"
