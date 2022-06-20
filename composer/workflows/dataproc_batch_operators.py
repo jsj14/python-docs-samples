@@ -25,14 +25,15 @@ https://airflow.apache.org/docs/apache-airflow/stable/concepts/variables.html
 * metastore_cluster is the Dataproc Metastore service name.
 * region_name is the region where the Dataproc Metastore service is located.
 
-TODO (https://github.com/GoogleCloudPlatform/python-docs-samples/issues/7803): Add the tutorial link once it is published.
+https://cloud.google.com/composer/docs/composer-2/run-dataproc-workloads
 """
 
 import datetime
 
 from airflow import models
 from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocCreateBatchOperator, DataprocDeleteBatchOperator, DataprocGetBatchOperator, DataprocListBatchesOperator
+    DataprocCreateBatchOperator, DataprocDeleteBatchOperator, DataprocGetBatchOperator, DataprocListBatchesOperator, 
+    DataprocInstantiateWorkflowTemplateOperator
 
 )
 from airflow.utils.dates import days_ago
@@ -50,7 +51,7 @@ PYTHON_FILE_LOCATION = "gs://{{var.value.bucket_name }}/spark-job.py"
 PHS_CLUSTER_PATH = \
     "projects/{{ var.value.project_id }}/regions/{{ var.value.region_name}}/clusters/{{ var.value.phs_cluster }}"
 # for e.g. projects/my-project/regions/my-region/clusters/my-cluster"
-SPARK_BIGQUERY_JAR_FILE = "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar" 
+SPARK_BIGQUERY_JAR_FILE = "gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"
 #use this for those pyspark jobs that need a spark-bigquery connector https://cloud.google.com/dataproc/docs/tutorials/bigquery-connector-spark-example
 # Start a Dataproc MetaStore Cluster
 METASTORE_SERVICE_LOCATION = \
@@ -71,9 +72,18 @@ with models.DAG(
     default_args=default_args,  # The interval with which to schedule the DAG
     schedule_interval=datetime.timedelta(days=1),  # Override to match your needs
 ) as dag:
-
+    create_template_batch = DataprocInstantiateWorkflowTemplateOperator(
+       # The task id of your job
+       task_id="batch-def2-sparkpi",
+       # The template id of your workflow
+       template_id="sparkpi",
+       project_id=project_id,
+       # The region for the template
+       region="us-central1",
+   )
+     
     create_batch = DataprocCreateBatchOperator(
-        task_id="batch_create",
+        task_id="batch-create",
         batch={
             "pyspark_batch": {
                 "main_python_file_uri": PYTHON_FILE_LOCATION,
